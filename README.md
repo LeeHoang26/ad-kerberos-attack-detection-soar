@@ -1,4 +1,7 @@
-# Active Directory Threat Detection & Automated SOAR Containment
+﻿> This scenario is now maintained as part of the consolidated [Active Directory Threat Detection & Response Lab](https://github.com/LeeHoang26/ad-threat-detection-and-response-lab).
+>
+> This repository remains available as the historical standalone version. For the current portfolio structure, start with the consolidated repository.
+># Active Directory Threat Detection & Automated SOAR Containment
 
 A hands-on detection engineering and automated incident response lab focused on Kerberos credential harvesting attacks (**AS-REP Roasting** and **Kerberoasting**) in an Active Directory environment.
 
@@ -97,7 +100,7 @@ Building this pipeline revealed several critical design decisions that different
 
 ### 1. The Anti-DoS Dilemma (Why Disabling Accounts Can Backfire)
 - **The v1 Prototype:** Initially, any alert triggered an immediate LDAP call to disable the account involved (as seen in the earlier lab logs). 
-- **The Operational Flaw:** In Kerberoasting, the roasted identity is a **service account** (e.g., MSSQL, IIS, ERP). If an attacker requests tickets for all SPNs in a domain, automatically disabling those accounts immediately shuts down company databases and web applications—effectively weaponizing the SOAR script into a self-inflicted Denial of Service.
+- **The Operational Flaw:** In Kerberoasting, the roasted identity is a **service account** (e.g., MSSQL, IIS, ERP). If an attacker requests tickets for all SPNs in a domain, automatically disabling those accounts immediately shuts down company databases and web applicationsâ€”effectively weaponizing the SOAR script into a self-inflicted Denial of Service.
 - **The v2 Architecture:**
   - **Kerberoasting:** Automated account disablement is explicitly suppressed. The script notifies the SOC team with the attacker's IP and target SPN, flagging the source host for network isolation.
   - **AS-REP Roasting:** While tested in lab with automated user disablement for containment validation, in production environments this can also be exploited if an attacker sprays AS-REQs for all pre-auth disabled users. The recommended enterprise action is perimeter IP blocking and forcing pre-auth re-enablement.
@@ -151,10 +154,10 @@ Real-time incident alert dispatched via Telegram bot and identity-level containm
 
 ```text
 ad-kerberos-attack-detection-soar/
-├── assets/                    # Lab screenshots and alert captures
-├── custom-soar.py             # Wazuh SOAR integration script (LDAP + Telegram)
-├── local_rules.xml            # Custom Wazuh correlation rules
-└── README.md                  # Project documentation & engineering notes
+â”œâ”€â”€ assets/                    # Lab screenshots and alert captures
+â”œâ”€â”€ custom-soar.py             # Wazuh SOAR integration script (LDAP + Telegram)
+â”œâ”€â”€ local_rules.xml            # Custom Wazuh correlation rules
+â””â”€â”€ README.md                  # Project documentation & engineering notes
 ```
 
 ---
@@ -177,3 +180,4 @@ ad-kerberos-attack-detection-soar/
 2. **LDAP vs LDAPS:** The integration script supports secure LDAPS (Port 636, `AD_USE_LDAPS=true`) to prevent cleartext credential sniffing across network segments.
 3. **Threshold vs Single-Event Alerting:** Rule 100100 matches single Kerberos RC4 requests (`0x17`) to validate lab triggers. In high-volume production Active Directory domains, detection rules should incorporate frequency thresholds (e.g., more than 5 SPN requests within 10 seconds from a single user) to filter out legacy RC4 applications and focus on bulk roasting tools.
 4. **AS-REP Roasting Containment:** Disabling user accounts via automation in lab proves containment capability. In enterprise production, isolating the attacker IP at the perimeter and alerting the IAM team to enforce Kerberos pre-authentication is the preferred non-disruptive response.
+
